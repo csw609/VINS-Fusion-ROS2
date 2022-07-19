@@ -46,6 +46,10 @@ double F_THRESHOLD;
 int SHOW_TRACK;
 int FLOW_BACK;
 
+//UWB
+std::string UWB_TOPIC = "/nlink_linktrack_nodeframe2";
+int USE_UWB = 1;
+
 
 template <typename T>
 T readParam(rclcpp::Node::SharedPtr n, std::string name)
@@ -89,6 +93,10 @@ void readParameters(std::string config_file)
     FLOW_BACK = fsSettings["flow_back"];
 
     MULTIPLE_THREAD = fsSettings["multiple_thread"];
+
+    //UWB
+    fsSettings["uwb_topic"] >> UWB_TOPIC;
+    USE_UWB = fsSettings["uwb"];
 
     USE_IMU = fsSettings["imu"];
     printf("USE_IMU: %d\n", USE_IMU);

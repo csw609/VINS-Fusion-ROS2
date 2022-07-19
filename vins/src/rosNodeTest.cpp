@@ -29,6 +29,25 @@ queue<sensor_msgs::msg::Image::ConstPtr> img0_buf;
 queue<sensor_msgs::msg::Image::ConstPtr> img1_buf;
 std::mutex m_buf;
 
+void uwb_callback(const nlink_parser_interfaces::msg::LinktrackNodeframe2::SharedPtr uwb_msg)
+{
+    double dDist = 0;
+    double dTime = 0;
+
+    if(!uwb_msg->nodes.empty()){
+        dDist = uwb_msg->nodes[0].dis;
+        uwb_msg->header.stamp.sec + uwb_msg->header.stamp.nanosec * (1e-9);
+        //uwb_msg->nodes[0].header;
+        std::cout << dDist << "\n";
+        estimator.inputUWB(dTime, dDist);
+    }
+    else{
+        std::cout << "empty" << "\n";
+    }
+    
+    
+}
+
 // header: 1403715278
 void img0_callback(const sensor_msgs::msg::Image::SharedPtr img_msg)
 {
@@ -272,8 +291,8 @@ int main(int argc, char **argv)
         sub_imu = n->create_subscription<sensor_msgs::msg::Imu>(IMU_TOPIC, rclcpp::QoS(rclcpp::KeepLast(2000)), imu_callback);
     }
     auto sub_feature = n->create_subscription<sensor_msgs::msg::PointCloud>("/feature_tracker/feature", rclcpp::QoS(rclcpp::KeepLast(2000)), feature_callback);
-    auto sub_img0 = n->create_subscription<sensor_msgs::msg::Image>(IMAGE0_TOPIC, rclcpp::QoS(rclcpp::KeepLast(100)), img0_callback);
-    
+    auto sub_img0    = n->create_subscription<sensor_msgs::msg::Image>(IMAGE0_TOPIC, rclcpp::QoS(rclcpp::KeepLast(100)), img0_callback);
+    auto sub_uwb     = n->create_subscription<nlink_parser_interfaces::msg::LinktrackNodeframe2>(UWB_TOPIC, rclcpp::QoS(rclcpp::KeepLast(100)), uwb_callback);
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_img1 = NULL;
     if(STEREO)
     {
@@ -283,7 +302,7 @@ int main(int argc, char **argv)
     auto sub_restart = n->create_subscription<std_msgs::msg::Bool>("/vins_restart", rclcpp::QoS(rclcpp::KeepLast(100)), restart_callback);
     auto sub_imu_switch = n->create_subscription<std_msgs::msg::Bool>("/vins_imu_switch", rclcpp::QoS(rclcpp::KeepLast(100)), imu_switch_callback);
     auto sub_cam_switch = n->create_subscription<std_msgs::msg::Bool>("/vins_cam_switch", rclcpp::QoS(rclcpp::KeepLast(100)), cam_switch_callback);
-
+    
     std::thread sync_thread{sync_process};
     rclcpp::spin(n);
 

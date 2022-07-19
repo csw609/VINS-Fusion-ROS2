@@ -289,6 +289,10 @@ void Estimator::processMeasurements()
 
         pair<double, map<int, vector<pair<int, Eigen::Matrix<double, 7, 1> > > > > feature;
         vector<pair<double, Eigen::Vector3d>> accVector, gyrVector;
+
+        // uwb related
+        vector<pair<double, double>> vecRange;
+
         if(!featureBuf.empty())
         {
             // cout << "1" << endl;
@@ -317,6 +321,10 @@ void Estimator::processMeasurements()
                 // cout << "2-2)" << endl;
             }
 
+            // uwb related
+            if(USE_UWB)
+                getUWBInterval(prevTime, curTime, vecRange);
+
             featureBuf.pop();
             mBuf.unlock();
 
@@ -338,6 +346,25 @@ void Estimator::processMeasurements()
                 }
             }
             // cout << "4" << endl;
+
+            // uwb related
+            if(USE_UWB)
+            {
+                for(size_t i = 0; i < vecRange.size(); i++)
+                {
+                  double dt;
+                  if(i == 0)
+                      dt = vecRange[i].first - prevTime;
+                  else if (i == accVector.size() - 1)
+                      dt = curTime - vecRange[i - 1].first;
+                  else
+                      dt = vecRange[i].first - vecRange[i - 1].first;
+                  // processUWB(rangeVector[i].first, dt, rangeVector[i].second);
+
+                  dRange[i] = vecRange[i].second;
+                  std::cout << "Range[" << i <<"] : " << dRange[i] << std::endl;
+                }
+            }
 
             mProcess.lock();
             processImage(feature.second, feature.first);
@@ -1669,4 +1696,47 @@ void Estimator::updateLatestStates()
         tmp_gyrBuf.pop();
     }
     mPropagate.unlock();
+}
+
+//UWB
+// uwb related
+void Estimator::inputUWB(double dTime, double dDist)
+{
+    mBuf.lock();
+    uwbBuf.push(make_pair(dTime, dDist));
+    std::cout << "push" << dTime << "\n";
+    mBuf.unlock();
+}
+
+bool Estimator::getUWBInterval(double dTime0, double dTime1, vector<pair<double, double>> &vecRange)
+{
+    if(uwbBuf.empty())
+    {
+        printf("not receive uwb\n");
+        return false;
+    }
+    //printf("get imu from %f %f\n", t0, t1);
+    //printf("imu fornt time %f   imu end time %f\n", accBuf.front().first, accBuf.back().first);
+    if(dTime1 <= uwbBuf.back().first)
+    {
+        while (uwbBuf.front().first <= dTime0)
+          uwbBuf.pop();
+
+        while (uwbBuf.front().first < dTime1)
+        {
+            vecRange.push_back(uwbBuf.front());
+            uwbBuf.pop();
+        }
+        vecRange.push_back(uwbBuf.front());
+    }
+    else
+    {
+        printf("wait for uwb\n");
+        return false;
+    }
+    // std::cout << "rangeVector size : " << rangeVector.size() << std::endl;
+    // for(size_t i = 0; i < rangeVector.size(); i++){
+    //   std::cout << "rangeVector time : " << rangeVector[i].first << std::endl;
+    // }
+    return true;
 }

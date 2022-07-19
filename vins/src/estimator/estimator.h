@@ -36,6 +36,9 @@
 #include "../factor/projectionOneFrameTwoCamFactor.h"
 #include "../featureTracker/feature_tracker.h"
 
+#include "nlink_parser_interfaces/msg/linktrack_nodeframe2.hpp"
+#include "nlink_parser_interfaces/msg/linktrack_node2.hpp"
+
 #define ROS_INFO RCUTILS_LOG_INFO
 #define ROS_WARN RCUTILS_LOG_WARN
 #define ROS_ERROR RCUTILS_LOG_ERROR
@@ -178,4 +181,11 @@ class Estimator
 
     bool initFirstPoseFlag;
     bool initThreadFlag;
+
+    //UWB
+    queue<pair<double, double>> uwbBuf;
+    void inputUWB(double dTime, double dDist);
+    bool bFirstUWB;
+    double dRange[(WINDOW_SIZE + 1)];
+    bool getUWBInterval(double dTime0, double dTime1, vector<pair<double, double>> &vecRange);
 };

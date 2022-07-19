@@ -19,10 +19,11 @@ find_package(tf2_ros REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(camera_models REQUIRED)
 find_package(image_transport REQUIRED)
-
+find_package(nlink_parser_interfaces REQUIRED)
 
 find_package(OpenCV REQUIRED)
 find_package(Ceres REQUIRED)
+
 
 include_directories(${CERES_INCLUDE_DIRS})
 
@@ -55,10 +56,10 @@ add_library(vins_lib
     src/featureTracker/feature_tracker.cpp)
 target_link_libraries(vins_lib  ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
-ament_target_dependencies(vins_lib rclcpp rcpputils std_msgs visualization_msgs geometry_msgs nav_msgs tf2 tf2_ros cv_bridge camera_models image_transport)
+ament_target_dependencies(vins_lib rclcpp rcpputils std_msgs visualization_msgs geometry_msgs nav_msgs tf2 tf2_ros cv_bridge camera_models image_transport nlink_parser_interfaces)
 
 add_executable(vins_node src/rosNodeTest.cpp)
-ament_target_dependencies(vins_node rclcpp rcpputils std_msgs visualization_msgs geometry_msgs nav_msgs tf2 tf2_ros cv_bridge camera_models image_transport)
+ament_target_dependencies(vins_node rclcpp rcpputils std_msgs visualization_msgs geometry_msgs nav_msgs tf2 tf2_ros cv_bridge camera_models image_transport nlink_parser_interfaces)
 target_link_libraries(vins_node vins_lib) 
 
 add_executable(kitti_odom_test src/KITTIOdomTest.cpp)

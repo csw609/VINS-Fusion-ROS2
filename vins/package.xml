@@ -21,6 +21,9 @@
   <depend>camera_models</depend>
   <depend>image_transport</depend>
 
+  <build_depend>nlink_parser_interfaces</build_depend>
+  <exec_depend>nlink_parser_interfaces</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
