@@ -71,6 +71,7 @@ extern int FLOW_BACK;
 //UWB
 extern std::string UWB_TOPIC;
 extern int USE_UWB;
+extern int USE_METHOD;
 
 void readParameters(std::string config_file);
 

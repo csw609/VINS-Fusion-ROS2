@@ -41,9 +41,9 @@ void uwb_callback(const nlink_parser_interfaces::msg::LinktrackNodeframe2::Share
         std::cout << dDist << "\n";
         estimator.inputUWB(dTime, dDist);
     }
-    else{
-        std::cout << "empty" << "\n";
-    }
+    // else{
+    //     std::cout << "empty" << "\n";
+    // }
     
     
 }

@@ -49,6 +49,7 @@ int FLOW_BACK;
 //UWB
 std::string UWB_TOPIC = "/nlink_linktrack_nodeframe2";
 int USE_UWB = 1;
+int USE_METHOD = 0;
 
 
 template <typename T>
@@ -97,6 +98,7 @@ void readParameters(std::string config_file)
     //UWB
     fsSettings["uwb_topic"] >> UWB_TOPIC;
     USE_UWB = fsSettings["uwb"];
+    USE_METHOD = fsSettings["method"];
 
     USE_IMU = fsSettings["imu"];
     printf("USE_IMU: %d\n", USE_IMU);

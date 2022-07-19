@@ -1138,6 +1138,22 @@ void Estimator::optimization()
         }
     }
 
+    // uwb related
+    if(USE_UWB)
+    {
+      std::cout << "USE UWB " << std::endl;
+
+      for(int i = 0; i < frame_count; i++)
+      {
+        Eigen::Vector2d anchor_pose;
+        anchor_pose[0] = 1.928;  // Check!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        anchor_pose[1] = 1.0195; // Check!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        ceres::CostFunction* cost_function = new ceres::AutoDiffCostFunction<UWBFactor, 1, 1, 7>(new UWBFactor(anchor_pose));
+        problem.AddResidualBlock(cost_function, NULL, &dRange[i], para_Pose[i]);
+      }
+    }
+
     int f_m_cnt = 0;
     int feature_index = -1;
     for (auto &it_per_id : f_manager.feature)
